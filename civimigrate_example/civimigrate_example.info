@@ -1,0 +1,14 @@
+name = "Civimigrate Example"
+description = "Example CiviCRM migration."
+package = "CiviMigrate"
+core = 7.x
+dependencies[] = civicrm
+dependencies[] = civimigrate
+dependencies[] = migrate
+
+files[] = civimigrate_example.module
+files[] = people.inc
+files[] = payments.inc
+
+
+
