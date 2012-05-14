@@ -16,9 +16,10 @@ abstract class Civimigration extends Migration {
     if($this->debug ==1){
       $this->destination->debug=1;
     }
+
     if(!empty($this->base_table) && !empty($this->base_table_id)){
-      $columns = db_query("SHOW columns from {$this->base_table} WHERE field = :base_table_id",array( 'base_table_id' => $this->base_table_id  ));
-      foreach ($columns as $column ) {  
+      $columns = db_query("SHOW columns from {$this->base_table} WHERE field = ':base_table_id'", array('base_table_id' => $this->base_table_id));
+      foreach ($columns as $column) {
         // 'type' is returned as 'int(11)' - need to separated if there is a length
         $type = explode('(', $column->type);
         $length = array();
