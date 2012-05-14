@@ -1,247 +1,82 @@
-<?php 
+<?php
 
-abstract class Civimigration extends Migration {
-  
-  protected $base_table;
-  protected $base_table_id;
-  protected $base_table_alias;
-  protected $query;
-  protected $entity = 'contact';
-  protected $debug = 0;
-  protected $matchexternalidentifier = 1;// if set then for contacts the external_identifier will be used to look up existing contacts
-  public function __construct() {
+/*
+ * Implementation of hook_migrate_api().
+ */
+function  civimigrate_migrate_api() {
 
-    parent::__construct(MigrateGroup::getInstance('CiviCRM'));
-    $this->destination = new MigrateDestinationCivicrmApi($this->entity);
-    if($this->debug ==1){
-      $this->destination->debug=1;
-    }
-    if(!empty($this->base_table) && !empty($this->base_table_id)){
-      $columns = db_query("SHOW columns from {$this->base_table} WHERE field = :base_table_id",array( 'base_table_id' => $this->base_table_id  ));
-      foreach ($columns as $column ) {  
-        // 'type' is returned as 'int(11)' - need to separated if there is a length
-        $type = explode('(', $column->type);
-        $length = array();
-        if(array_key_exists(1, $type)){//length key
-          $length = array('length' => substr($type[1],0, -1));
-        }
-
-        $this->map = new MigrateSQLMap($this->machineName,
-          array(
-            $this->base_table_id => array( 'type' => $type[0],                          
-                          'not null' => $column->null,
-          								'alias' => empty($this->base_table_alias) ? $this->base_table : $this->base_table_alias,
-                          )+ $length
-            ),
-           MigrateDestinationCivicrmApi::getKeySchema()
-          );
-      
-      }
-  }
-
-    
-    
-  }
-  /*
-   * You can override this but the default function does a lookup on external identifier 
-   * and does a match on that if present
-   */
-  public function prepare(&$entity, &$row) {
-    if($this->matchexternalidentifier && strtolower($this->entity) == 'contact' && empty($entity->id)  && !empty($entity->external_identifier) ){
-      $existingID = (civicrm_api('contact','getvalue',array('version' => 3,'return' => 'id', 'external_identifier' => $entity->external_identifier )));
-      if(!empty($existingID) && !is_array($existingID)){
-        $entity->id = $existingID;
-      }
-    }  
-  } 
-  /*
-   * Get started DB object based on table
-   */
-  protected function getQuery($table,$alias, $idKey =""){
-   
-    $query = db_select( $table ,$alias);
-    $fields = $this->gettableFields($table,$alias);
-    foreach ($fields as $field) {
-       if($field == $idKey){
-        $query->addField($alias, $field, $field);        
-       }else{
-       $query->addField($alias, $field, strtolower($alias . "_" . $field));
-       }
-    }
-    return $query;
-  }
-  /*
-   * Get all fields in table
-   */  
-  protected function gettableFields($table, $alias = ""){
-
-    $fields = array();
-    $sql = "SHOW COLUMNS FROM {$table}";
-    $result = db_query($sql);
-    foreach ($result as $record) {
-      $fields[] =   $record->field;
-    }
-    return $fields;
-  }
-
-  /*
-   * Get all fields in table
-   */  
-  protected function addtableFields(&$query,$table, $alias = ""){
-    if(empty($alias)){
-      $alias = $table;
-    }
-    $fields = array();
-    $sql = "SHOW COLUMNS FROM {$table}";
-    $result = db_query($sql);
-    foreach ($result as $record) {
-      $query->addField($alias, $record->field, $alias . "_" . strtolower($record->field));
-    }
-  }
-  
-  /*
-   * Convert Microsoft Timestamp to mysql friendly date.
-   * @param string $ms_date MS date string
-   * @param Bool $force Definitely needs conversion - by default function tests if it is already a valid timestamp
-   * (this is in case data is inconsistently being sent through)
-   * 
-   */
-   function mssql2mysql($ms_date, $force = 0)
-   { 
-     if(empty($ms_date)){
-       return null;
-     }
-     if(!strtotime($ms_date) || $force)
-     $timestamp = ($ms_date - 25569) * 86400;
-     return date('Y-m-d',$timestamp);
-   }
-
-  
- }
- 
-
-
-function civimigrate_menu() {
-  return array(
-   'civimigrate-mapper' => array(
-     'page callback' => 'civimigrate_page_callback',
-     'access arguments' => array('administer nodes'),
-     'type' => MENU_CALLBACK,
-   ),
-   'civimigrate-mapper/%cmid/edit' => array(
-     'page callback' => 'drupal_get_form',
-     'page arguments' => array('civimigrate_page_form', 1),
-     'type' => MENU_CALLBACK,
-     'access arguments' => array('administer nodes'),
-   ),
- );
-}
-
-function cmid_load($cmid) {
-  $results = db_query("SELECT * FROM {civimigrate_mappings} WHERE cmid = :cmid", array(':cmid' => $cmid));
-  $cmid = array();
-  foreach ($results as $result) {
-    $cmid = array(
-      'cmid' => $result->cmid,
-      'source_field' => $result->source_field,
-      'destination_field' => $result->destination_field,
-      'description' => $result->description,
-      'table' => $result->table,
-      'issuegroup' => $result->issuegroup,
+  // Initialise CiviCRM (not tested yet)
+  $api = array(
+    'api' => 1,
+  );
+  if(module_exists('dbtng')){
+    $api = array(
+      'api' => 2,
     );
-  }
-  return $cmid;
-}
-
-function civimigrate_callback() {
-  drupal_set_title("Civimigrate_mappings table");
-  $results = db_query("SELECT * FROM {civimigrate_mappings}"); 
-  $table = array(
-    'header' => array(
-      'cmid',
-      'source_field',
-      'destination_field',
-      'description',
-      'table',
-      'issuegroup',
-      'Edit',
-    ),
-    'rows' => array(),
-  );
-  foreach ($results as $result) {
-    $table['rows'][] = array(
-      $result->cmid,
-      $result->source_field,
-      $result->destination_field,
-      $result->description,
-      $result->table,
-      $result->issuegroup,
-      l('Edit', "civimigrate-mapper/{$result->cmid}/edit"),
-    );
-  }
-  return theme('table', $table);
-}
-
-function civimigrate_form($form, &$form_state, $cmid) {
-  drupal_set_title("Editing mapping {$cmid['cmid']}");
-  $form['source_field'] = array(
-    '#title' => 'Source Field',
-    '#type' => 'textfield',
-    '#default_value' => $cmid['source_field'],
-  );
-  $form['destination_field'] = array(
-    '#title' => 'Destination Field',
-    '#type' => 'textfield',
-    '#default_value' => $cmid['destination_field'],
-  );
-  $form['description'] = array(
-    '#title' => 'Description',
-    '#type' => 'textarea',
-    '#default_value' => $cmid['description'],
-   );
-  $form['table'] = array(
-    '#title' => 'Table',
-    '#type' => 'textfield',
-    '#default_value' => $cmid['table'],
-  );
-  $form['issuegroup'] = array(
-    '#title' => 'Issue Group',
-    '#type' => 'textfield',
-    '#default_value' => $cmid['issuegroup'],
-  );
-  $form['cmid'] = array(
-    '#type' => 'hidden',
-    '#value' => $cmid['cmid'],
-  );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Save',
-  );
-  return $form;
-}
-
-function civimigrate_form_validate($form, &$form_state) {
-  foreach ($form_state['values'] as $key => $value) {
-    $value = trim($value);
-    if (empty($value) && $value != 0) {
-      $form_state['values'][$key] = NULL;
+    require_once 'civimigrate.class.inc';
+    require_once 'civimigrate.d6.class.inc';
     }
-  }
+  return $api;
 }
 
-function civimigrate_form_submit($form, &$form_state) {
-  $record = array(
-    'source_field' => $form_state['values']['source_field'],
-    'destination_field' => $form_state['values']['destination_field'],
-    'description' => $form_state['values']['description'],
-    //'table' => $form_state['values']['table'],
-    'issuegroup' => $form_state['values']['issuegroup'],
-  );
-  $result = db_update('civimigrate_mappings')
-    ->fields($record)
-    ->condition('cmid', $form_state['values']['cmid'])
-    ->execute();
-  drupal_set_message("$result row(s) updated.");
-  drupal_goto('civimigrate-mapper');
-} 
- 
+function civimigrate_migrate_init() {
+  civicrm_initialize(true );
+  require_once('api/api.php');
+  //yeah I know this is clunky - I just kept adding more - it made sense when I started - honest guv
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.phone.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.survey.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.contact.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.helpers.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.contribution.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.pledge.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.address.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.parse.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.relationship.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.entitytag.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.participant.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.event.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.activity.inc';
+  include_once($path);
+  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.groupcontact.inc';
+  include_once($path);
+   $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.membership.inc';
+  include_once($path);
+   $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.note.inc';
+  include_once($path);
+  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.ufjoin.inc');
+  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.email.inc');
+  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.relationshiptype.inc');
+  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.website.inc');
+  
+}
+
+
+function civimigrate_migrate_types() {
+  $types = array('address' => t('CiviCRM Address'),
+  							 'contact' => t('CiviCRM Contact'), 
+  							 'contribution' => t('CiviCRM Contribution'), 
+  							 'pledge' => t('CiviCRM Pledge'),
+
+  							 'phone' => t('CiviCRM phone'),
+                 'relationshiptype' => t('CiviCRM Relationship Type'),
+  							 'relationship' => t('CiviCRM relationship'),
+  							 'entitytag' => t('CiviCRM Tag'),
+  							 'parse' => t('CiviCRM parse'),
+  							 'participant' => t('CiviCRM participant'),'event' => t('CiviCRM event'),'activity' => t('CiviCRM activity'),'groupcontact' => t('CiviCRM group membership'),'membership' => t('CiviCRM membership'),'email' => t('CiviCRM email'), 'note' => t('CiviCRM note'),'survey' => t('CiviCRM survey (or campaign)'),
+  							 'ufjoin'=>t('CiviCRM UF Join (profile linkage to entity - generally a form'),
+                 'website' => t('CiviCRM website'));
+  return $types;
+}
+

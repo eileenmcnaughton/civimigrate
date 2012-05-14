@@ -1,7 +1,11 @@
-name = "CiviMigrate"
-description = "CiviCRM Migrate extension"
-core = 7.x
-package = "Fuzion"
-dependencies[] = migrate
-dependencies[] = civicrm
+; $Id$
+name = CiviMigrate
+description = Add on for Migrate module to migrate data into CiviCRM developed by Fuzion
+core = 6.x
+package = CiviCRM
+version = 1.0
+dependencies[] = "migrate"
+dependencies[] = "civicrm"
+files[] = civimigrate.class.inc
 files[] = destinations/civicrm_api.inc
+

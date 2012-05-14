@@ -77,7 +77,7 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     migrate_instrument_start('civicrm_contact_delete_multiple');
     $this->prepareRollback($ids);
     foreach ($ids as $id) {
-      civicrm_api($this->entity, 'delete', array('version' => 3, 'id' => $id, 'skip_undelete' => 1)) ;
+      civicrm_api('contact', 'delete', array('version' => 3, 'id' => $id, 'skip_undelete' => 1)) ;
     }
     $this->completeRollback($ids);
     migrate_instrument_stop('civicrm_contact_delete_multiple');
@@ -130,9 +130,7 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     }
 
     $this->prepare($paramsobj, $row);
-    if($paramsobj->civimigrate_skip == 1){
-      throw new MigrateException('record intentionally skipped per job set up');
-    }
+
     if (isset($params['id']) ) {
       $updating = TRUE;
     }
