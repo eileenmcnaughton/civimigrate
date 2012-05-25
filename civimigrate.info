@@ -1,7 +1,7 @@
 name = "CiviMigrate"
 description = "CiviCRM Migrate extension"
 core = 7.x
-package = "Fuzion"
+package = "Migrate"
 dependencies[] = migrate
 dependencies[] = civicrm
 files[] = destinations/civicrm_api.inc
