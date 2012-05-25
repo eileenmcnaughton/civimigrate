@@ -125,13 +125,13 @@ abstract class Civimigration extends Migration {
 function civimigrate_menu() {
   return array(
    'civimigrate-mapper' => array(
-     'page callback' => 'civimigrate_page_callback',
+     'page callback' => 'civimigrate_callback',
      'access arguments' => array('administer nodes'),
      'type' => MENU_CALLBACK,
    ),
    'civimigrate-mapper/%cmid/edit' => array(
      'page callback' => 'drupal_get_form',
-     'page arguments' => array('civimigrate_page_form', 1),
+     'page arguments' => array('civimigrate_form', 1),
      'type' => MENU_CALLBACK,
      'access arguments' => array('administer nodes'),
    ),
