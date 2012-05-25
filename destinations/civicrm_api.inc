@@ -130,7 +130,7 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     }
 
     $this->prepare($paramsobj, $row);
-    if(!isset($paramsobj->civimigrate_skip) && $paramsobj->civimigrate_skip == 1){
+    if(isset($paramsobj->civimigrate_skip) && $paramsobj->civimigrate_skip == 1){
       throw new MigrateException('record intentionally skipped per job set up');
     }
 
