@@ -16,12 +16,8 @@ abstract class Civimigration extends Migration {
     if ($this->debug == 1) {
       $this->destination->debug = 1;
     }
-
     if (! empty($this->base_table) && ! empty($this->base_table_id)) {
-      $columns = db_query("SHOW columns from {$this->base_table} WHERE field = ':base_table_id'", array(
-        'base_table_id' => $this->base_table_id
-      ));
-      foreach ($columns as $column) {
+      $column = $this->gettableField($this->base_table, $this->base_table_id);
         // 'type' is returned as 'int(11)' - need to separated if there is a length
         $type = explode('(', $column->type);
         $length = array();
@@ -39,10 +35,18 @@ abstract class Civimigration extends Migration {
           ) + $length
         ), MigrateDestinationCivicrmApi::getKeySchema());
 
-      }
-    }
 
+        $query = $this->getQuery($this->base_table,$this->base_table_alias,$this->base_table_id);
+        $this->source = new MigrateSourceSQL($query);
 
+        $mappings = $this->getmappings();
+        foreach ($mappings as $mapping) {
+          $this->addFieldMapping(empty($mapping->mappings_destination_field) ? null : $mapping->mappings_destination_field , $mapping->mappings_source_field)
+           ->description($mapping->mappings_description)
+           ->issueGroup($mapping->mappings_issuegroup)
+           ->defaultValue($mapping->mappings_default) ;
+        }
+  }
   }
   /*
    * You can override this but the default function does a lookup on external identifier
@@ -78,6 +82,28 @@ abstract class Civimigration extends Migration {
     return $query;
   }
   /*
+   * Get specific field in table
+   */
+  protected function gettableField($table, $column){
+
+   $columns = db_query("SHOW columns from {$this->base_table} WHERE field = ':column'",array( 'column' => $column ));
+      foreach ($columns as $column ) {
+        return $column;
+      }
+  }
+
+ /*
+   * Get specific field in table
+   */
+  protected function getmappings(){
+
+    $mappingquery = $this->getQuery('civimigrate_mappings','mappings');
+    $mappingquery->condition('migration', $this->machineName);
+    $mappings = $mappingquery->execute();
+    return $mappings;
+  }
+
+  /*
    * Get all fields in table
    */
   protected function gettableFields($table, $alias = "") {
@@ -102,7 +128,7 @@ abstract class Civimigration extends Migration {
     $sql = "SHOW COLUMNS FROM {$table}";
     $result = db_query($sql);
     foreach ($result as $record) {
-      $query->addField($alias, $record->Field, $alias . "_" . strtolower($record->Field));
+      $query->addField($alias, $record->Field, $alias . "_" . strtolower($record->field));
     }
   }
 
