@@ -130,17 +130,19 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     }
 
     $this->prepare($paramsobj, $row);
-    if($paramsobj->civimigrate_skip == 1){
+    if(!isset($paramsobj->civimigrate_skip) && $paramsobj->civimigrate_skip == 1){
       throw new MigrateException('record intentionally skipped per job set up');
     }
+
+    $paramsobj->version = 3;
+    $params = (array) $paramsobj;
     if (isset($params['id']) ) {
       $updating = TRUE;
     }
     else {
       $updating = FALSE;
     }
-    $paramsobj->version = 3;
-    $params = (array) $paramsobj;
+
     if($this->debug ==1){
        drupal_set_message("<pre>Params as passed to API".print_r($params,true)."</pre>");
     }
