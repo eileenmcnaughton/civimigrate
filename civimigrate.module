@@ -64,7 +64,7 @@ abstract class Civimigration extends Migration {
     $fields = $this->gettableFields($table,$alias);
     foreach ($fields as $field) {
        if($field == $idKey){
-        $query->addField($alias, $field, $field);        
+        $query->addField($alias, $field, $field);
        }else{
        $query->addField($alias, $field, strtolower($alias . "_" . $field));
        }
@@ -80,7 +80,7 @@ abstract class Civimigration extends Migration {
     $sql = "SHOW COLUMNS FROM {$table}";
     $result = db_query($sql);
     foreach ($result as $record) {
-      $fields[] =   $record->field;
+      $fields[] =   $record->Field;
     }
     return $fields;
   }
@@ -96,7 +96,7 @@ abstract class Civimigration extends Migration {
     $sql = "SHOW COLUMNS FROM {$table}";
     $result = db_query($sql);
     foreach ($result as $record) {
-      $query->addField($alias, $record->field, $alias . "_" . strtolower($record->field));
+      $query->addField($alias, $record->field, $alias . "_" . strtolower($record->Field));
     }
   }
   
