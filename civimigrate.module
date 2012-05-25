@@ -72,6 +72,7 @@ abstract class Civimigration extends Migration {
     $query = db_select($table, $alias);
     $fields = $this->gettableFields($table, $alias);
     foreach ($fields as $field) {
+      $field = strtolower($field);
       if ($field == $idKey) {
         $query->addField($alias, $field, $field);
       }
