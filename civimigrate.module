@@ -129,7 +129,7 @@ abstract class Civimigration extends Migration {
     $sql = "SHOW COLUMNS FROM {$table}";
     $result = db_query($sql);
     foreach ($result as $record) {
-      $query->addField($alias, $record->Field, $alias . "_" . strtolower($record->field));
+      $query->addField($alias, $record->Field, $alias . "_" . strtolower($record->Field));
     }
   }
 
