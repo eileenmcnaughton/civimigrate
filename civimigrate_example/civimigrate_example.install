@@ -5,8 +5,7 @@
  * Set up the migration example module.
  */
 
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'civimigrate_example') .
-  '/people.install.inc';
+require_once drupal_get_path('module', 'civimigrate_example') . '/people.install.inc';
 
 function civimigrate_example_schema() {
   $schema = civimigrate_example_people_schema();
