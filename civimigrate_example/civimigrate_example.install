@@ -13,6 +13,7 @@ function civimigrate_example_schema() {
 }
 
 function civimigrate_example_install() {
+  drupal_install_schema('civimigrate_example');
   civimigrate_example_people_install();
 }
 
