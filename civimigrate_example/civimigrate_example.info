@@ -1,7 +1,7 @@
 name = "Civimigrate Example"
 description = "Example CiviCRM migration."
 package = "CiviMigrate"
-core = 7.x
+core = 6.x
 dependencies[] = civicrm
 dependencies[] = civimigrate
 dependencies[] = migrate
