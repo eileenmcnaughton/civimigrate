@@ -26,6 +26,5 @@ function civimigrate_example_uninstall() {
 
 function civimigrate_example_disable() {
   civimigrate_example_people_disable();
-
 }
 
