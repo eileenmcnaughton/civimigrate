@@ -1,6 +1,6 @@
-<?php 
+<?php
 abstract class Civimigration extends Migration {
-  
+
   protected $base_table;
   protected $base_table_id;
   protected $base_table_alias;
@@ -17,7 +17,7 @@ abstract class Civimigration extends Migration {
       $this->destination->debug=1;
     }
     if(!empty($this->base_table) && !empty($this->base_table_id)){
-      $column = $this->gettableField($this->base_table, $this->base_table_id); 
+      $column = $this->gettableField($this->base_table, $this->base_table_id);
         // 'type' is returned as 'int(11)' - need to separated if there is a length
         $type = explode('(', $column->type);
         $length = array();
@@ -27,18 +27,18 @@ abstract class Civimigration extends Migration {
 
         $this->map = new MigrateSQLMap($this->machineName,
           array(
-            $this->base_table_id => array( 'type' => $type[0],                          
+            $this->base_table_id => array( 'type' => $type[0],
                           'not null' => $column->null,
                           'alias' => empty($this->base_table_alias) ? $this->base_table : $this->base_table_alias,
                           )+ $length
             ),
            MigrateDestinationCivicrmApi::getKeySchema()
           );
-      
+
       if($this->autoquery == 1){
         $query = $this->getQuery($this->base_table,$this->base_table_alias,$this->base_table_id);
         $this->source = new MigrateSourceSQL($query);
-        
+
         $mappings = $this->getmappings();
         foreach ($mappings as $mapping) {
           $this->addFieldMapping(empty($mapping->mappings_destination_field) ? null : $mapping->mappings_destination_field , $mapping->mappings_source_field)
@@ -49,11 +49,11 @@ abstract class Civimigration extends Migration {
       }
   }
 
-    
-    
+
+
   }
   /*
-   * You can override this but the default function does a lookup on external identifier 
+   * You can override this but the default function does a lookup on external identifier
    * and does a match on that if present
    */
   public function prepare(&$entity, &$row) {
@@ -62,46 +62,46 @@ abstract class Civimigration extends Migration {
       if(!empty($existingID) && !is_array($existingID)){
         $entity->id = $existingID;
       }
-    }  
-  } 
+    }
+  }
   /*
    * Get started DB object based on table
    */
   protected function getQuery($table,$alias, $idKey =""){
-   
+
     $query = db_select( $table ,$alias);
-    $this->addFieldsFromtable($query,$table,$alias);
+    $this->addFieldsFromtable($query,$table,$alias, $idKey);
     return $query;
   }
 /*
- * Add all fields to function (there is a function to do this as a * but 
+ * Add all fields to function (there is a function to do this as a * but
  * by adding them by name they become visible in the source fields in migrateUI
  */
-  protected function addFieldsFromtable(&$query,$table,$alias){
+  protected function addFieldsFromtable(&$query,$table,$alias,$idKey = null){
     $fields = $this->gettableFields($table,$alias);
     foreach ($fields as $field) {
        if($field == $idKey){
-        $query->addField($alias, $field, $field);        
+        $query->addField($alias, $field, $field);
        }else{
        $query->addField($alias, $field, strtolower($alias . "_" . $field));
        }
     }
   }
-  
+
   /*
    * Get specific field in table
-   */  
+   */
   protected function gettableField($table, $column){
 
    $columns = db_query("SHOW columns from {$this->base_table} WHERE field = :column",array( 'column' => $column ));
-      foreach ($columns as $column ) { 
+      foreach ($columns as $column ) {
         return $column;
       }
   }
-  
+
  /*
    * Get specific field in table
-   */  
+   */
   protected function getmappings(){
 
     $mappingquery = $this->getQuery('civimigrate_mappings','mappings');
@@ -109,10 +109,10 @@ abstract class Civimigration extends Migration {
     $mappings = $mappingquery->execute();
     return $mappings;
   }
-  
+
   /*
    * Get all fields in table
-   */  
+   */
   protected function gettableFields($table, $alias = ""){
 
     $fields = array();
@@ -126,7 +126,7 @@ abstract class Civimigration extends Migration {
 
   /*
    * Get all fields in table
-   */  
+   */
   protected function addtableFields(&$query,$table, $alias = ""){
     if(empty($alias)){
       $alias = $table;
@@ -138,16 +138,16 @@ abstract class Civimigration extends Migration {
       $query->addField($alias, $record->field, $alias . "_" . strtolower($record->field));
     }
   }
-  
+
   /*
    * Convert Microsoft Timestamp to mysql friendly date.
    * @param string $ms_date MS date string
    * @param Bool $force Definitely needs conversion - by default function tests if it is already a valid timestamp
    * (this is in case data is inconsistently being sent through)
-   * 
+   *
    */
    function mssql2mysql($ms_date, $force = 0)
-   { 
+   {
      if(empty($ms_date)){
        return null;
      }
@@ -156,5 +156,5 @@ abstract class Civimigration extends Migration {
      return date('Y-m-d',$timestamp);
    }
 
-  
+
  }
