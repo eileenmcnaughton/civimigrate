@@ -7,5 +7,6 @@ version = 1.0
 dependencies[] = "migrate"
 dependencies[] = "civicrm"
 files[] = civimigrate.class.inc
+files[] = civimigrate.d6.class.inc
 files[] = destinations/civicrm_api.inc
 
