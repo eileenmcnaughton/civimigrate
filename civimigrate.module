@@ -4,79 +4,10 @@
  * Implementation of hook_migrate_api().
  */
 function  civimigrate_migrate_api() {
-
-  // Initialise CiviCRM (not tested yet)
-  $api = array(
-    'api' => 1,
-  );
-  if(module_exists('dbtng')){
+    require_once 'civimigrate.class.inc';
+    require_once 'civimigrate.d6.class.inc';
     $api = array(
       'api' => 2,
     );
-    require_once 'civimigrate.class.inc';
-    require_once 'civimigrate.d6.class.inc';
-    }
   return $api;
 }
-
-function civimigrate_migrate_init() {
-  civicrm_initialize(true );
-  require_once('api/api.php');
-  //yeah I know this is clunky - I just kept adding more - it made sense when I started - honest guv
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.phone.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.survey.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.contact.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.helpers.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.contribution.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.pledge.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.address.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.parse.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.relationship.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.entitytag.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.participant.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.event.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.activity.inc';
-  include_once($path);
-  $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.groupcontact.inc';
-  include_once($path);
-   $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.membership.inc';
-  include_once($path);
-   $path = drupal_get_path('module', 'civimigrate') . '/civimigrate.note.inc';
-  include_once($path);
-  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.ufjoin.inc');
-  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.email.inc');
-  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.relationshiptype.inc');
-  include_once(drupal_get_path('module', 'civimigrate') . '/civimigrate.website.inc');
-  
-}
-
-
-function civimigrate_migrate_types() {
-  $types = array('address' => t('CiviCRM Address'),
-  							 'contact' => t('CiviCRM Contact'), 
-  							 'contribution' => t('CiviCRM Contribution'), 
-  							 'pledge' => t('CiviCRM Pledge'),
-
-  							 'phone' => t('CiviCRM phone'),
-                 'relationshiptype' => t('CiviCRM Relationship Type'),
-  							 'relationship' => t('CiviCRM relationship'),
-  							 'entitytag' => t('CiviCRM Tag'),
-  							 'parse' => t('CiviCRM parse'),
-  							 'participant' => t('CiviCRM participant'),'event' => t('CiviCRM event'),'activity' => t('CiviCRM activity'),'groupcontact' => t('CiviCRM group membership'),'membership' => t('CiviCRM membership'),'email' => t('CiviCRM email'), 'note' => t('CiviCRM note'),'survey' => t('CiviCRM survey (or campaign)'),
-  							 'ufjoin'=>t('CiviCRM UF Join (profile linkage to entity - generally a form'),
-                 'website' => t('CiviCRM website'));
-  return $types;
-}
-
