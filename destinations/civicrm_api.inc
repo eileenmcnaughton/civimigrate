@@ -103,12 +103,12 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
        drupal_set_message("<pre>".print_r($paramsobj,true)."</pre>");
        drupal_set_message("<pre>".print_r($row,true)."</pre>");
    }
-	
+
     $migration = Migration::currentMigration();
     // Updating previously-migrated content?
     if (isset($row->migrate_map_destid1)) {
       if (isset($paramsobj->id)) {
-        if ($params->id != $row->migrate_map_destid1) {
+        if ($paramsobj->id != $row->migrate_map_destid1) {
           throw new MigrateException(t("Incoming id !id and map destination id !destid1 don't match",
             array('!id' => $paramsobj->id, '!destid1' => $row->migrate_map_destid1)));
         }
