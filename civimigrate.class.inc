@@ -41,16 +41,22 @@ abstract class Civimigration extends Migration {
 
         $mappings = $this->getmappings();
         foreach ($mappings as $mapping) {
-          $this->addFieldMapping(empty($mapping->mappings_destination_field) ? null : $mapping->mappings_destination_field , $mapping->mappings_source_field)
+          $destField = empty($mapping->mappings_destination_field) ? null : $mapping->mappings_destination_field;
+          $sourceField = empty($mapping->mappings_source_field) ? null : $mapping->mappings_source_field;
+          if(empty($sourceField)){
+           $this->addFieldMapping($destField)
            ->description($mapping->mappings_description)
            ->issueGroup($mapping->mappings_issuegroup)
            ->defaultValue($mapping->mappings_default) ;
+          }else{
+          $this->addFieldMapping($destField, $sourceField)
+           ->description($mapping->mappings_description)
+           ->issueGroup($mapping->mappings_issuegroup)
+           ->defaultValue($mapping->mappings_default) ;
+          }
         }
       }
   }
-
-
-
   }
   /*
    * You can override this but the default function does a lookup on external identifier
