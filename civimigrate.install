@@ -68,7 +68,7 @@ $schema['civimigrate_mappings'] = array(
  */
 function civimigrate_install() {
   // Create tables
-  drupal_install_schema('civimigrate_mappings');
+  drupal_install_schema('civimigrate');
 }
 
 /**
