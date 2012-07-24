@@ -76,7 +76,7 @@ function civimigrate_install() {
  */
 function civimigrate_uninstall() {
   // Remove tables
-  drupal_uninstall_schema('civimigrate_mappings');
+  drupal_uninstall_schema('civimigrate');
 }
 
 function civimigrate_update_6001(){
