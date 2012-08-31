@@ -38,25 +38,24 @@ abstract class Civimigration extends Migration {
       if($this->autoquery == 1){
         $query = $this->getQuery($this->base_table,$this->base_table_alias,$this->base_table_id);
         $this->source = new MigrateSourceSQL($query);
-
-        $mappings = $this->getmappings();
-        foreach ($mappings as $mapping) {
-          $destField = empty($mapping->mappings_destination_field) ? null : $mapping->mappings_destination_field;
-          $sourceField = empty($mapping->mappings_source_field) ? null : $mapping->mappings_source_field;
-          if(empty($sourceField)){
-           $this->addFieldMapping($destField)
-           ->description($mapping->mappings_description)
-           ->issueGroup($mapping->mappings_issuegroup)
-           ->defaultValue($mapping->mappings_default) ;
-          }else{
-          $this->addFieldMapping($destField, $sourceField)
-           ->description($mapping->mappings_description)
-           ->issueGroup($mapping->mappings_issuegroup)
-           ->defaultValue($mapping->mappings_default) ;
-          }
-        }
       }
-  }
+    }
+    $mappings = $this->getmappings();
+    foreach ($mappings as $mapping) {
+      $destField = empty($mapping->mappings_destination_field) ? null : $mapping->mappings_destination_field;
+      $sourceField = empty($mapping->mappings_source_field) ? null : $mapping->mappings_source_field;
+      if(empty($sourceField)){
+        $this->addFieldMapping($destField)
+        ->description($mapping->mappings_description)
+        ->issueGroup($mapping->mappings_issuegroup)
+        ->defaultValue($mapping->mappings_default) ;
+      }else{
+        $this->addFieldMapping($destField, $sourceField)
+        ->description($mapping->mappings_description)
+        ->issueGroup($mapping->mappings_issuegroup)
+        ->defaultValue($mapping->mappings_default) ;
+      }
+    }
   }
   /*
    * You can override this but the default function does a lookup on external identifier
