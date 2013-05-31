@@ -6,6 +6,7 @@ abstract class Civimigration extends Migration {
   protected $base_table_id;
   protected $base_table_alias;
   protected $query;
+  protected $_db;
   protected $entity = 'contact';
   protected $debug = 0;
   protected $matchexternalidentifier = 1; // if set then for contacts the external_identifier will be used to look up existing contacts
@@ -19,18 +20,28 @@ abstract class Civimigration extends Migration {
     if (! empty($this->base_table) && ! empty($this->base_table_id)) {
       $column = $this->gettableField($this->base_table, $this->base_table_id);
         // 'type' is returned as 'int(11)' - need to separated if there is a length
-        $type = explode('(', $column->type);
+        if(isset($column->type)){
+          $type = explode('(', $column->type);
+        }
+        else{
+          $type = explode('(', $column->Type);
+        }
         $length = array();
         if (array_key_exists(1, $type)) { //length key
           $length = array(
             'length' => substr($type[1], 0, - 1)
           );
         }
-
+        if(isset($column->null)){
+          $null = $column->null;
+        }
+        else{
+          $null = $column->Null;
+        }
         $this->map = new MigrateSQLMap($this->machineName, array(
           $this->base_table_id => array(
             'type' => $type[0],
-            'not null' => $column->null,
+            'not null' => $null,
             'alias' => empty($this->base_table_alias) ? $this->base_table : $this->base_table_alias
           ) + $length
         ), MigrateDestinationCivicrmApi::getKeySchema());
@@ -69,7 +80,7 @@ abstract class Civimigration extends Migration {
    */
   protected function getQuery($table, $alias, $idKey = "") {
 
-    $query = db_select($table, $alias);
+    $query = db_select($this->_db . $table, $alias);
     $fields = $this->gettableFields($table, $alias);
     foreach ($fields as $field) {
       $field = strtolower($field);
@@ -87,7 +98,7 @@ abstract class Civimigration extends Migration {
    */
   protected function gettableField($table, $column){
 
-   $columns = db_query("SHOW columns from {$this->base_table} WHERE field = ':column'",array( 'column' => $column ));
+   $columns = db_query("SHOW columns from {{$this->base_table}} WHERE field = '{$column}'");
       foreach ($columns as $column ) {
         return $column;
       }
@@ -110,7 +121,7 @@ abstract class Civimigration extends Migration {
   protected function gettableFields($table, $alias = "") {
 
     $fields = array();
-    $sql = "SHOW COLUMNS FROM {$table}";
+    $sql = "SHOW COLUMNS FROM {{$table}}";
     $result = db_query($sql);
     foreach ($result as $record) {
       $fields[] = $record->Field;
