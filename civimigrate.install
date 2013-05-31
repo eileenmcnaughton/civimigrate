@@ -1,0 +1,85 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+/**
+* Implements hook_schema().
+*/
+function civimigrate_schema() {
+$schema['civimigrate_mappings'] = array(
+    'description' => 'Stores migration mappings.',
+    'fields' => array(
+      'cmid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique aba_group_postcodes ID.',
+      ),
+      'source_field' => array(
+        'description' => 'field name in source',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'destination_field' => array(
+        'description' => 'api field name',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+       'default' => array(
+        'description' => 'default value for field',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'migration' => array(
+        'description' => 'migration class name',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+        'description' => array(
+        'description' => 'comments (not actioned)',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+        'issuegroup' => array(
+        'description' => 'Category',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ) ,
+    'primary key' => array('cmid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function civimigrate_install() {
+  // Create tables
+  drupal_install_schema('civimigrate');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function civimigrate_uninstall() {
+  // Remove tables
+  drupal_uninstall_schema('civimigrate');
+}
+
+function civimigrate_update_6001(){
+    drupal_install_schema('civimigrate');
+}
+
