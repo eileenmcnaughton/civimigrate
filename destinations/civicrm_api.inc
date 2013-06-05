@@ -57,7 +57,7 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     return;
   }
   require_once 'CRM/Utils/Array.php';
-	$fields = civicrm_api($this->entity,'getfields',array('version' => 3));
+	$fields = civicrm_api($this->entity,'getfields',array('version' => 3, 'action' => 'create'));
   $values = array();
   foreach ($fields['values'] as $field => $valueArray) {
     $values[$field] = CRM_Utils_Array::value('title',$valueArray,CRM_Utils_Array::value('label',$valueArray,CRM_Utils_Array::value('name',$valueArray)));  }
@@ -103,7 +103,7 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
        drupal_set_message("<pre>".print_r($paramsobj,true)."</pre>");
        drupal_set_message("<pre>".print_r($row,true)."</pre>");
    }
-	
+
     $migration = Migration::currentMigration();
     // Updating previously-migrated content?
     if (isset($row->migrate_map_destid1)) {
