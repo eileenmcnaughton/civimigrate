@@ -23,13 +23,14 @@ $schema['civimigrate_mappings'] = array(
         'description' => 'field name in source',
         'type' => 'varchar',
         'length' => 32,
-        'not null' => TRUE,
+        'not null' => FALSE,
       ),
       'destination_field' => array(
         'description' => 'api field name',
         'type' => 'varchar',
         'length' => 32,
-        'not null' => TRUE,
+
+        'not null' => FALSE,
       ),
        'default' => array(
         'description' => 'default value for field',
