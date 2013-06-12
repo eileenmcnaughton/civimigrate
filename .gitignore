@@ -1,6 +1,13 @@
+<<<<<<< HEAD
+.svn
+.project
+.settings
+.buildpath
+=======
 INSTALL.txt
 LICENSE.txt
 README.txt
 demos/
 extras/documentation
 
+>>>>>>> 3523030fddb7aaf62543b25027a9d3ec5c0039bb
