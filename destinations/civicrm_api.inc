@@ -57,11 +57,11 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     return;
   }
   require_once 'CRM/Utils/Array.php';
-	$fields = civicrm_api($this->entity,'getfields',array('version' => 3));
+  $fields = civicrm_api($this->entity,'getfields',array('version' => 3, 'action' => 'create'));
   $values = array();
   foreach ($fields['values'] as $field => $valueArray) {
     $values[$field] = CRM_Utils_Array::value('title',$valueArray,CRM_Utils_Array::value('label',$valueArray,CRM_Utils_Array::value('name',$valueArray)));  }
-	  return $values;
+    return $values;
   }
 
   /**
@@ -130,6 +130,10 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     }
 
     $this->prepare($paramsobj, $row);
+
+    if(isset($paramsobj->civimigrate_skip) && $paramsobj->civimigrate_skip == 1){
+      throw new MigrateException('record intentionally skipped per job set up');
+    }
 
     if (isset($params['id']) ) {
       $updating = TRUE;
