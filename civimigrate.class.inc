@@ -82,14 +82,14 @@ abstract class Civimigration extends Migration {
  * Add all fields to function (there is a function to do this as a * but
  * by adding them by name they become visible in the source fields in migrateUI
  */
-  protected function addFieldsFromtable(&$query,$table,$alias,$idKey = null){
-    $fields = $this->gettableFields($table,$alias);
+  protected function addFieldsFromtable(&$query, $table, $alias, $idKey = null){
+    $fields = $this->gettableFields($table, $alias);
     foreach ($fields as $field) {
-       if($field == $idKey){
+      if($field == $idKey){
         $query->addField($alias, $field, $field);
-       }else{
-       $query->addField($alias, $field, strtolower($alias . "_" . $field));
-       }
+      }else{
+        $query->addField($alias, $field, strtolower($alias . "_" . $field));
+      }
     }
   }
 
