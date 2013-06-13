@@ -85,8 +85,8 @@ abstract class Civimigration extends Migration {
   protected function addFieldsFromtable(&$query, $table, $alias, $idKey = null){
     $fields = $this->gettableFields($table, $alias);
     foreach ($fields as $field) {
-      if($field == $idKey){
-        $query->addField($alias, $field, $field);
+      if(strtolower($field) == strtolower($idKey)){
+        $query->addField($alias, $field, strtolower($field));
       }else{
         $query->addField($alias, $field, strtolower($alias . "_" . $field));
       }
