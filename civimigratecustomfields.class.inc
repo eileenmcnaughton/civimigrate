@@ -4,7 +4,15 @@
  * @file
  * Migrate members from ORCAS to CiviCRM.
  */
+/**
+ * wow - d6 migrate destination uses this but it doesn't exist in d6
+ * @param unknown_type $var
+ * @return mixed
+ */
 
+ function drupal_json_decode($var) {
+   return json_decode($var, TRUE);
+ }
 /**
  *
  */
@@ -43,6 +51,7 @@ class CiviMigrateCustomFields extends Civimigration_drupal6 {
     );
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('label', 'label');
+    $this->addFieldMapping('is_active')->defaultValue(1);
     $this->addFieldMapping('data_type', 'data_type')->defaultValue('String');
     $this->addFieldMapping('html_type', 'html_type')->defaultValue('Text');
   }
@@ -126,12 +135,19 @@ class CiviMigrateCustomFields extends Civimigration_drupal6 {
       )
     );
     if(!empty($group['id'])){
+      //make sure it's active
+      civicrm_api('custom_group', 'create', array(
+        'version' => 3,
+        'id' => $group['id'],
+        'is_active' => 1,
+      ));
       return $group['id'];
     }
     $group = civicrm_api('custom_group', 'create', array(
       'version' => 3,
       'title' => $groupTitle,
-      'extends' => $extends
+      'extends' => $extends,
+      'is_active' => 1,
       )
     );
     if($group['is_error']){
