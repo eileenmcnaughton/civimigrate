@@ -4,16 +4,11 @@
  * @file
  * Migrate members from ORCAS to CiviCRM.
  */
-/**
- * wow - d6 migrate destination uses this but it doesn't exist in d6
- * @param unknown_type $var
- * @return mixed
- */
 
 /**
  *
  */
-class CiviMigrateOptions extends Civimigration_drupal6 {
+class CiviMigrateOptions extends Civimigration {
   protected $debug = 0; // Set to 1 for debug info.
   protected $json_folder = NULL;
   protected $options = array();
@@ -95,27 +90,27 @@ class CiviMigrateOptions extends Civimigration_drupal6 {
    * @see Migration::preImport()
 
   public function postImport() {
-    parent::postImport();
-    if(!civicrm_initialize()){
-      return;
-    }
-    // need to clear the cache once the fields are created
-    civicrm_api('system', 'flush', array('version' => 3));
+  parent::postImport();
+  if(!civicrm_initialize()){
+  return;
+  }
+  // need to clear the cache once the fields are created
+  civicrm_api('system', 'flush', array('version' => 3));
   }
    */
 
-/**
- * Get or create relevant group id
- * @param integer $groupTitle
- * @param string $extends
- * @throws MigrateException
- * @return integer groupID
- */
+  /**
+   * Get or create relevant group id
+   * @param integer $groupTitle
+   * @param string $extends
+   * @throws MigrateException
+   * @return integer groupID
+   */
   function getOptionGroupID($groupTitle){
     $group = civicrm_api('option_group', 'get', array(
-      'version' => 3,
-      'name' => $groupTitle,
-      'return' => 'id',
+        'version' => 3,
+        'name' => $groupTitle,
+        'return' => 'id',
       )
     );
 
@@ -129,9 +124,9 @@ class CiviMigrateOptions extends Civimigration_drupal6 {
       return $group['id'];
     }
     $group = civicrm_api('option_group', 'create', array(
-      'version' => 3,
-      'name' => $groupTitle,
-      'is_active' => 1,
+        'version' => 3,
+        'name' => $groupTitle,
+        'is_active' => 1,
       )
     );
     if($group['is_error']){
@@ -140,16 +135,16 @@ class CiviMigrateOptions extends Civimigration_drupal6 {
     return $group['id'];
   }
 
-/**
- * Get / create custom field
- * @param integer $customGroupID
- * @param string $field  - this will be the key of a field in $this->customFields
- */
+  /**
+   * Get / create custom field
+   * @param integer $customGroupID
+   * @param string $field  - this will be the key of a field in $this->customFields
+   */
   function ensureOptionValueID($option, $entity){
     $params = array(
-        'version' => 3,
-        'option_group_id' => $entity->id,
-     );
+      'version' => 3,
+      'option_group_id' => $entity->id,
+    );
     foreach ($option as $property => $value){
       $params[$property] = $value;
     }

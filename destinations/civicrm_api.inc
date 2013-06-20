@@ -1,6 +1,6 @@
 <?php
 
- /**
+/**
  * Destination class implementing migration into users.
  */
 class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
@@ -9,7 +9,7 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
   static public function getKeySchema() {
 
 
-   return array(
+    return array(
       'id' => array(
         'type' => 'int',
         'unsigned' => TRUE,
@@ -28,10 +28,10 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
    * @param string $text_format
    *  Default text format for users created via this destination class.
    */
- /* static public function options($language, $text_format) {
-    return compact('language', 'text_format');
-  }
-  */
+  /* static public function options($language, $text_format) {
+     return compact('language', 'text_format');
+   }
+   */
 
   /**
    * Basic initialization
@@ -53,15 +53,15 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
    *  Values: Human-friendly descriptions of the fields.
    */
   public function fields() {
-  if(!civicrm_initialize()){
-    return;
-  }
-  require_once 'CRM/Utils/Array.php';
-	$fields = civicrm_api($this->entity,'getfields',array('version' => 3, 'action' => 'create'));
-  $values = array();
-  foreach ($fields['values'] as $field => $valueArray) {
-    $values[$field] = CRM_Utils_Array::value('title',$valueArray,CRM_Utils_Array::value('label',$valueArray,CRM_Utils_Array::value('name',$valueArray)));  }
-	  return $values;
+    if(!civicrm_initialize()){
+      return;
+    }
+    require_once 'CRM/Utils/Array.php';
+    $fields = civicrm_api($this->entity,'getfields',array('version' => 3, 'action' => 'create'));
+    $values = array();
+    foreach ($fields['values'] as $field => $valueArray) {
+      $values[$field] = CRM_Utils_Array::value('title',$valueArray,CRM_Utils_Array::value('label',$valueArray,CRM_Utils_Array::value('name',$valueArray)));  }
+    return $values;
   }
 
   /**
@@ -100,19 +100,19 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
    *  successful. FALSE on failure.
    */
   public function import(stdClass $paramsobj, stdClass $row) {
-   if(!civicrm_initialize()){
+    if(!civicrm_initialize()){
       return;
-   }
-   if($this->debug ==1){
-       drupal_set_message("<pre>".print_r($paramsobj,true)."</pre>");
-       drupal_set_message("<pre>".print_r($row,true)."</pre>");
-   }
+    }
+    if($this->debug ==1){
+      drupal_set_message("<pre>".print_r($paramsobj,true)."</pre>");
+      drupal_set_message("<pre>".print_r($row,true)."</pre>");
+    }
 
     $migration = Migration::currentMigration();
     // Updating previously-migrated content?
     if (isset($row->migrate_map_destid1)) {
       if (isset($paramsobj->id)) {
-        if ($params->id != $row->migrate_map_destid1) {
+        if ($paramsobj->id != $row->migrate_map_destid1) {
           throw new MigrateException(t("Incoming id !id and map destination id !destid1 don't match",
             array('!id' => $paramsobj->id, '!destid1' => $row->migrate_map_destid1)));
         }
@@ -125,35 +125,35 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
       if (!isset($paramsobj->id)) {
         throw new MigrateException(t('System-of-record is DESTINATION, but no destination uid provided'));
       }
-    //TODO - do anything with this - maybe not
-    //  $old_account = user_load($params['id'], TRUE);
+      //TODO - do anything with this - maybe not
+      //  $old_account = user_load($params['id'], TRUE);
     }
     else {
-    //TODO - do anything with this - maybe not
+      //TODO - do anything with this - maybe not
       // $old_account = $account;
     }
 
     $this->prepare($paramsobj, $row);
+
     if(isset($paramsobj->civimigrate_skip) && $paramsobj->civimigrate_skip == 1){
       throw new MigrateException('record intentionally skipped per job set up');
     }
 
-    $paramsobj->version = 3;
-    $params = (array) $paramsobj;
     if (isset($params['id']) ) {
       $updating = TRUE;
     }
     else {
       $updating = FALSE;
     }
-
+    $paramsobj->version = 3;
+    $params = (array) $paramsobj;
     if($this->debug ==1){
-       drupal_set_message("<pre>Params as passed to API".print_r($params,true)."</pre>");
+      drupal_set_message("<pre>Params as passed to API".print_r($params,true)."</pre>");
     }
     migrate_instrument_start('civicrm_' . $this->entity . '_import');
     $apiresult = civicrm_api($this->entity,'create',$params);
     if($this->debug ==1){
-       drupal_set_message("<pre>Result from API".print_r($apiresult,true)."</pre>");
+      drupal_set_message("<pre>Result from API".print_r($apiresult,true)."</pre>");
     }
     migrate_instrument_stop('civicrm_' . $this->entity . '_import');
     if($apiresult['is_error'] ==1){
