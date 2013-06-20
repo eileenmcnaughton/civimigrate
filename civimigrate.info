@@ -5,3 +5,4 @@ package = "Migrate"
 dependencies[] = migrate
 dependencies[] = civicrm
 files[] = destinations/civicrm_api.inc
+files[] = civimigratecustomfields.class.inc
