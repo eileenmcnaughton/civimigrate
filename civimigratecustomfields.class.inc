@@ -8,7 +8,7 @@
 /**
  *
  */
-class CiviMigrateCustomFields extends CiviMigration {
+class CiviMigrateCustomFields extends Civimigration_drupal6 {
   protected $debug = 0; // Set to 1 for debug info.
   protected $json_folder = NULL;
   protected $customFields = array();
