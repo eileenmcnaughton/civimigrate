@@ -77,7 +77,7 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     migrate_instrument_start('civicrm_contact_delete_multiple');
     $this->prepareRollback($ids);
     foreach ($ids as $id) {
-      civicrm_api('contact', 'delete', array('version' => 3, 'id' => $id, 'skip_undelete' => 1)) ;
+      civicrm_api($this->entity, 'delete', array('version' => 3, 'id' => $id, 'skip_undelete' => 1));
     }
     $this->completeRollback($ids);
     migrate_instrument_stop('civicrm_contact_delete_multiple');
