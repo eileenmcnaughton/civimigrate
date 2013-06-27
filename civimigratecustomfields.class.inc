@@ -86,6 +86,14 @@ class CiviMigrateCustomFields extends Civimigration_drupal6 {
     if(empty($entity->id)){
       $entity->id = $this->getCustomFieldID($entity);
     }
+    if(!empty($row->options) && $row->options->type == 'shared'){
+      // we are sharing with another field
+      $entity->option_group_id =  civicrm_api('custom_field', 'getvalue', array(
+        'version' => 3,
+        'name' => $row->options->fieldname,
+        'return' => 'option_group_id',
+    ));
+    }
   }
 
   /**
@@ -148,6 +156,7 @@ class CiviMigrateCustomFields extends Civimigration_drupal6 {
       'title' => $groupTitle,
       'extends' => $extends,
       'is_active' => 1,
+      'style' => 'Inline',
       )
     );
     if($group['is_error']){
