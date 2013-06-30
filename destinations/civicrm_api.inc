@@ -77,7 +77,11 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     migrate_instrument_start('civicrm_contact_delete_multiple');
     $this->prepareRollback($ids);
     foreach ($ids as $id) {
-      civicrm_api($this->entity, 'delete', array('version' => 3, 'id' => $id, 'skip_undelete' => 1)) ;
+      try{
+        civicrm_api($this->entity, 'delete', array('version' => 3, 'id' => $id, 'skip_undelete' => 1));
+      } catch (Exception $e){
+        throw new MigrateException('failed to delete ' . $id);
+      }
     }
     $this->completeRollback($ids);
     migrate_instrument_stop('civicrm_contact_delete_multiple');
