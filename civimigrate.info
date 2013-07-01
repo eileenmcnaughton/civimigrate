@@ -6,3 +6,6 @@ dependencies[] = migrate
 dependencies[] = civicrm
 files[] = destinations/civicrm_api.inc
 files[] = civimigratecustomfields.class.inc
+files[] = civimigrateoptions.class.inc
+files[] = sources/civijson.inc
+
