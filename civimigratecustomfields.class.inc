@@ -10,9 +10,6 @@
  * @return mixed
  */
 
- function drupal_json_decode($var) {
-   return json_decode($var, TRUE);
- }
 /**
  *
  */
@@ -45,8 +42,8 @@ class CiviMigrateCustomFields extends Civimigration_drupal6 {
       MigrateDestinationCivicrmApi::getKeySchema()
     );
     $this->source = new MigrateSourceList(
-      new CiviMigrateListJSON($item_url),
-      new CiviMigrateFileItemJSON($item_url, $http_options),
+      new CiviMigrateListJSON($item_url, 'fieldname'),
+      new CiviMigrateFileItemJSON($item_url, $http_options, 'fieldname'),
       $this->fields()
     );
     $this->addFieldMapping('title', 'title');
@@ -235,61 +232,4 @@ class CiviMigrateCustomFields extends Civimigration_drupal6 {
     }
   }
 }
-/**
- * Here we are expectingto be loading from file not url so we need to cope with that
- * Taken from https://drupal.org/node/1152160 for starting point
- * @author eileen
- *
- */
-class CiviMigrateFileItemJSON extends MigrateItemJSON {
-  protected $data = array();
-  /**
-   * Two problems with the default getItem() - it reads and parses the JSON on
-   * each call, which we don't want to do for multiple items in the file; and,
-   * we need to retrieve a given item from the file according to its 'id' element.
-  */
-  public function getItem($id) {
-    // We cache the parsed JSON at $this->data.
-    if (empty($this->data)) {
-      $data = $this->loadJSONUrl($this->itemUrl);
-      if ($data) {
-        // Let's index the array by the ID for easy retrieval.
-        foreach ($data as $item) {
-          $this->data[$item->fieldname] = $item;
-        }
-      }
-      else {
-        // Error-handling here....
-      }
-    }
-    // Return the requested item
-    if (isset($this->data[$id])) {
-      return $this->data[$id];
-    }
-    else {
-      return NULL;
-    }
-  }
-}
 
-/**
- * Get ids from same file as items
- * Here we are expectingto be loading from file not url so we need to cope with that
- * Taken from https://drupal.org/node/1152160 for starting point
- * @author eileen
- *
- */
-class CiviMigrateListJSON extends MigrateListJSON {
-  /**
-   * The default implementation assumes the IDs are top-level array elements,
-   * but the array elements are the data items - we need to look inside them
-   * for the IDs.
-   */
-  protected function getIDsFromJSON(array $data) {
-    $ids = array();
-    foreach ($data as $item) {
-      $ids[] = $item['fieldname'];
-    }
-    return $ids;
-  }
-}
