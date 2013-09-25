@@ -5,6 +5,7 @@ abstract class Civimigration extends Migration {
   protected $base_table_id;
   protected $base_table_alias;
   protected $query;
+  protected $_db;
   protected $entity = 'contact';
   protected $debug = 0;
   protected $autoquery= 1;
@@ -18,22 +19,32 @@ abstract class Civimigration extends Migration {
     }
     if(!empty($this->base_table) && !empty($this->base_table_id)){
       $column = $this->gettableField($this->base_table, $this->base_table_id);
-        // 'type' is returned as 'int(11)' - need to separated if there is a length
+      // 'type' is returned as 'int(11)' - need to separated if there is a length
+      if(isset($column->type)){
         $type = explode('(', $column->type);
-        $length = array();
-        if(array_key_exists(1, $type)){//length key
-          $length = array('length' => substr($type[1],0, -1));
-        }
-
-        $this->map = new MigrateSQLMap($this->machineName,
-          array(
-            $this->base_table_id => array( 'type' => $type[0],
-                          'not null' => $column->null,
-                          'alias' => empty($this->base_table_alias) ? $this->base_table : $this->base_table_alias,
-                          )+ $length
-            ),
-           MigrateDestinationCivicrmApi::getKeySchema()
-          );
+      }
+      else{
+        $type = explode('(', $column->Type);
+      }
+      $length = array();
+      if (array_key_exists(1, $type)) { //length key
+        $length = array(
+          'length' => substr($type[1], 0, - 1)
+        );
+      }
+      if(isset($column->null)){
+        $null = $column->null;
+      }
+      else{
+        $null = $column->Null;
+      }
+      $this->map = new MigrateSQLMap($this->machineName, array(
+        $this->base_table_id => array(
+          'type' => $type[0],
+          'not null' => $null,
+          'alias' => empty($this->base_table_alias) ? $this->base_table : $this->base_table_alias
+        ) + $length
+      ), MigrateDestinationCivicrmApi::getKeySchema());
 
       if($this->autoquery == 1){
         $query = $this->getQuery($this->base_table,$this->base_table_alias,$this->base_table_id);
@@ -91,6 +102,7 @@ abstract class Civimigration extends Migration {
         $query->addField($alias, $field, strtolower($alias . "_" . $field));
       }
     }
+    return $query;
   }
 
   /*
