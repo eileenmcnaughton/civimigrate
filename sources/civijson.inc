@@ -14,9 +14,6 @@ class CiviMigrateFileItemJSON extends MigrateItemJSON {
 
   public function __construct($item_url, $httpOptions, $keyField){
     $this->keyField = $keyField;
-    if(!function_exists('drupal_json_decode')){
-      require_once('jsondecode.inc');
-    }
     parent::__construct($item_url, $httpOptions, $item_url);
   }
   /**
