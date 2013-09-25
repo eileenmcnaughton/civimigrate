@@ -136,7 +136,7 @@ abstract class Civimigration extends Migration {
     $sql = "SHOW COLUMNS FROM {$table}";
     $result = db_query($sql);
     foreach ($result as $record) {
-      $fields[] =   $record->field;
+      $fields[] =   $record->Field;
     }
     return $fields;
   }
