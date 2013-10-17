@@ -79,7 +79,4 @@ function civimigrate_uninstall() {
   drupal_uninstall_schema('civimigrate');
 }
 
-function civimigrate_update_6001(){
-    drupal_install_schema('civimigrate');
-}
 
