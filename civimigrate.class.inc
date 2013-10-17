@@ -10,9 +10,9 @@ abstract class Civimigration extends Migration {
   protected $debug = 0;
   protected $autoquery= 1;
   protected $matchexternalidentifier = 1;// if set then for contacts the external_identifier will be used to look up existing contacts
-  public function __construct() {
+  public function __construct(array $arguments) {
 
-    parent::__construct(MigrateGroup::getInstance('CiviCRM'));
+    parent::__construct($arguments);
     $this->destination = new MigrateDestinationCivicrmApi($this->entity);
     if($this->debug ==1){
       $this->destination->debug=1;

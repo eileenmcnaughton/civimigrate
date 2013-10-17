@@ -14,8 +14,8 @@ class CiviMigrateOptions extends Civimigration {
   protected $options = array();
   protected $entity = 'option_group';
 
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments = array()) {
+    parent::__construct($arguments);
     $this->description = t('Create custom values.');
 
     // This can also be an URL instead of a file path but we are assuming it shipe with the migrate module

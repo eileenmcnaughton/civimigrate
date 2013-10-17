@@ -9,8 +9,8 @@ class CiviMigrateCustomFields extends Civimigration {
   protected $customFields = array();
   protected $entity = 'custom_field';
 
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments) {
+    parent::__construct($arguments);
     $this->description = t('Create custom fields.');
 
     // This can also be an URL instead of a file path but we are assuming it shipe with the migrate module
