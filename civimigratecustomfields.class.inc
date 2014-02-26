@@ -3,7 +3,7 @@
 /**
  *
  */
-class CiviMigrateCustomFields extends Civimigration {
+abstract class CiviMigrateCustomFields extends Civimigration {
   protected $debug = 0; // Set to 1 for debug info.
   protected $json_folder = NULL;
   protected $customFields = array();
