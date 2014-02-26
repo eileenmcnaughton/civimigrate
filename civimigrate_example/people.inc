@@ -6,7 +6,7 @@
  */
 
 /**
- * Comments here are limited to CiviMigrate extension - more information is available in 
+ * Comments here are limited to CiviMigrate extension - more information is available in
  * the migrate_example module
  *
  * This is a very simple example drawing from a single table
@@ -22,12 +22,12 @@ class peopleMigration extends Civimigration {
     $this->description = t('Import people table');
 
     /*
-     * If you have no defined the base table above & the base_table_id the parent class will define the mapping otherwise 
+     * If you have no defined the base table above & the base_table_id the parent class will define the mapping otherwise
      * see migrate_example module for how
-     * 
+     *
      * Destination is defined by parent based on the $entity defined above
      */
-    
+
     /*
      * Define the query
      * getQuery is a civimigrate shortcut for adding all the fields in the table with the table
@@ -38,13 +38,13 @@ class peopleMigration extends Civimigration {
     $query = $this->getQuery($this->base_table,$this->base_table_alias,$this->base_table_id)
               ->condition('status', 1); // only include those with status = 1
     $this->source = new MigrateSourceSQL($query);
-    
+
     /*
      * Add the field mappings
      */
-    $this->addFieldMapping('first_name', 'names_name'); 
-    $this->addFieldMapping('contact_type')->defaultValue('Individual'); 
-    $this->addFieldMapping(null, 'names_posted')->description('To discuss');     
+    $this->addFieldMapping('first_name', 'names_name');
+    $this->addFieldMapping('contact_type')->defaultValue('Individual');
+    $this->addFieldMapping(null, 'names_posted')->description('To discuss');
   }
 }
 
