@@ -15,8 +15,8 @@ class paymentsMigration extends Civimigration {
   protected $base_table_alias = 'payments';
   protected $entity = 'contribution'; // this is the default
   protected $debug = 0;
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments = array()) {
+    parent::__construct($arguments);
     $this->description = t('Import people table');
 
 

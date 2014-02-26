@@ -17,8 +17,8 @@ class peopleMigration extends Civimigration {
   protected $base_table_alias = 'names';
   protected $entity = 'contact'; // this is the default
   protected $debug = 0; // set to 1 for debug info
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments = array()) {
+    parent::__construct($arguments);
     $this->description = t('Import people table');
 
     /*
