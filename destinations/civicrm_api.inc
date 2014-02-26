@@ -4,8 +4,8 @@
  * Destination class implementing migration into users.
  */
 class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
-  static $entity;
-  static $debug = 0;
+  public $entity;
+  public $debug = 0;
   static public function getKeySchema() {
 
 

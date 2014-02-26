@@ -72,7 +72,7 @@ abstract class Civimigration extends Migration {
    * You can override this but the default function does a lookup on external identifier
    * and does a match on that if present
    */
-  public function prepare(&$entity, &$row) {
+  public function prepare(&$entity, &$row){
     if($this->matchexternalidentifier && strtolower($this->entity) == 'contact' && empty($entity->id)  && !empty($entity->external_identifier) ){
       $existingID = (civicrm_api('contact','getvalue',array('version' => 3,'return' => 'id', 'external_identifier' => $entity->external_identifier )));
       if(!empty($existingID) && !is_array($existingID)){

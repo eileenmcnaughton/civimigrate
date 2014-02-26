@@ -60,7 +60,7 @@ class CiviMigrateCustomFields extends Civimigration {
    * (non-PHPdoc)
    * @see Civimigration::prepare()
    */
-  function prepare(&$entity, $row){
+  function prepare(&$entity, &$row){
     if(empty($entity->custom_group_id)){
       if(isset($row->custom_group->extends)){
         $extends = $row->custom_group->extends;
