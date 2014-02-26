@@ -64,14 +64,13 @@ class CiviMigrateOptions extends Civimigration {
    * (non-PHPdoc)
    * @see Civimigration::prepare()
    */
-  function prepare(&$entity, $row){
+  function prepare(&$entity, &$row){
     if(empty($entity->id)){
       $entity->id = $this->getOptionGroupID($row->name);
     }
     foreach ($row->options as $option){
       $this->ensureOptionValueID($option, $entity);
     }
-    drupal_set_message("<pre>" . print_r($entity ,1) . "</pre>");
   }
 
   /**
