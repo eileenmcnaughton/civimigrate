@@ -21,8 +21,8 @@ function civimigrate_example_people_uninstall() {
 }
 
 function civimigrate_example_people_disable() {
-  Migration::deregisterMigration('BeerTerm');
-  Migration::deregisterMigration('BeerUser');
+  Migration::deregisterMigration('peopleMigration');
+  Migration::deregisterMigration('paymentsMigration');
 }
 
 
