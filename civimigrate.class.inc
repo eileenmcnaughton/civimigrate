@@ -5,7 +5,8 @@ abstract class Civimigration extends Migration {
   protected $base_table_id;
   protected $base_table_alias;
   protected $query;
-  protected $_db;
+  protected $_db = '';
+  protected $_db_target = 'default';
   protected $entity = 'contact';
   protected $debug = 0;
   protected $autoquery= 1;
@@ -47,7 +48,7 @@ abstract class Civimigration extends Migration {
       ), MigrateDestinationCivicrmApi::getKeySchema());
 
       if($this->autoquery == 1){
-        $query = $this->getQuery($this->base_table,$this->base_table_alias,$this->base_table_id);
+        $query = $this->getQuery($this->base_table, $this->base_table_alias,$this->base_table_id);
         $this->source = new MigrateSourceSQL($query);
       }
     }
@@ -85,8 +86,7 @@ abstract class Civimigration extends Migration {
    * Get started DB object based on table
    */
   protected function getQuery($table,$alias, $idKey =""){
-
-    $query = db_select( $table ,$alias);
+    $query = db_select( $table ,$alias, array('target' => $this->_db_target));
     $this->addFieldsFromtable($query,$table,$alias, $idKey);
     return $query;
   }
@@ -110,11 +110,14 @@ abstract class Civimigration extends Migration {
    * Get specific field in table
    */
   protected function gettableField($table, $column){
-
-   $columns = db_query("SHOW columns from {$this->base_table} WHERE field = :column",array( 'column' => $column ));
-      foreach ($columns as $column ) {
-        return $column;
-      }
+   $sql = "SHOW columns from {" .  $this->base_table . "} WHERE field = :column";
+   $columns = db_query($sql,
+     array('column' => $column),
+     array('target' => $this->_db_target)
+   );
+   foreach ($columns as $column ) {
+     return $column;
+   }
   }
 
  /*
@@ -134,8 +137,8 @@ abstract class Civimigration extends Migration {
   protected function gettableFields($table, $alias = ""){
 
     $fields = array();
-    $sql = "SHOW COLUMNS FROM {$table}";
-    $result = db_query($sql);
+    $sql = "SHOW COLUMNS FROM {" . $table . "}";
+    $result = db_query($sql, array(), array('target' => $this->_db_target));
     foreach ($result as $record) {
       $fields[] =   $record->Field;
     }
