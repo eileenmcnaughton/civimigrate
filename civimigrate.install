@@ -22,7 +22,7 @@ $schema['civimigrate_mappings'] = array(
       'source_field' => array(
         'description' => 'field name in source',
         'type' => 'varchar',
-        'length' => 32,
+        'length' => 64,
         'not null' => FALSE,
       ),
       'destination_field' => array(
@@ -35,7 +35,7 @@ $schema['civimigrate_mappings'] = array(
         'description' => 'default value for field',
         'type' => 'varchar',
         'length' => 32,
-        'not null' => TRUE,
+        'not null' => FALSE,
       ),
       'migration' => array(
         'description' => 'migration class name',
@@ -50,10 +50,24 @@ $schema['civimigrate_mappings'] = array(
         'not null' => TRUE,
         'default' => '',
       ),
-        'issuegroup' => array(
+      'issuegroup' => array(
         'description' => 'Category',
         'type' => 'varchar',
         'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'real_name' => array(
+        'description' => 'Real Field Name',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'table_name' => array(
+        'description' => 'Real Table Name',
+        'type' => 'varchar',
+        'length' => 64,
         'not null' => TRUE,
         'default' => '',
       ),
@@ -73,6 +87,32 @@ function civimigrate_install() {
  * Implementation of hook_uninstall().
  */
 function civimigrate_uninstall() {
+}
+
+/**
+ * Add extra fields
+ */
+function civimigrate_update_7000() {
+  db_add_field('civimigrate_mappings', 'real_name', array('type' => 'varchar', 'length' => 64, 'not null' => TRUE, 'default' => ''));
+  db_add_field('civimigrate_mappings', 'table_name', array('type' => 'varchar', 'length' => 64, 'not null' => TRUE, 'default' => ''));
+}
+
+/**
+ * lengthen source, allow null on default
+ */
+function civimigrate_update_7001() {
+  db_change_field('civimigrate_mappings', 'source_field', 'source_field', array(
+    'description' => 'field name in source',
+    'type' => 'varchar',
+    'length' => 64,
+    'not null' => FALSE,
+  ));
+  db_change_field('civimigrate_mappings', 'default', 'default', array(
+    'description' => 'default value for field',
+    'type' => 'varchar',
+    'length' => 32,
+    'not null' => FALSE)
+  );
 }
 
 
