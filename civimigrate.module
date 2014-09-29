@@ -51,7 +51,7 @@ function cmid_load($cmid) {
 }
 
 function civimigrate_callback() {
-  drupal_set_title("Civimigrate_mappings table");
+  drupal_set_title("Civimigrate Mappings");
   $results = db_query("SELECT * FROM {civimigrate_mappings}");
   $table = array(
     'header' => array(
@@ -59,22 +59,49 @@ function civimigrate_callback() {
       'source_field',
       'destination_field',
       'description',
-      'table',
+      'real_name',
+      'table_name',
       'issuegroup',
+      'distinct row count',
+      'sample data',
       'Edit'
     ),
     'rows' => array()
   );
   foreach ($results as $result) {
-    $table['rows'][] = array(
+    $rowDetail = array(
       $result->cmid,
       $result->source_field,
       $result->destination_field,
       $result->description,
-      $result->table,
+      $result->real_name,
+      $result->table_name,
       $result->issuegroup,
-      l('Edit', "civimigrate-mapper/{$result->cmid}/edit")
     );
+    if (!empty($result->table_name) && !empty($result->real_name)) {
+      try {
+        $count = $rowDetail[] = db_query(
+          "SELECT COUNT(DISTINCT {$result->real_name}) FROM {{$result->table_name}}")->fetchField();
+        if ($count) {
+          $rowDetail[] = substr(implode(',', db_query(
+            "SELECT DISTINCT {$result->real_name} FROM {{$result->table_name}} WHERE {$result->real_name} IS NOT NULL LIMIT 5"
+          )->fetchAssoc()), 0, 32);
+        }
+        else {
+          $rowDetail[] = '';
+        }
+      }
+      catch (Exception $e) {
+        $rowDetail[] = '?';
+        $rowDetail[] = '?';
+      }
+    }
+    else {
+      $rowDetail[] = '';
+      $rowDetail[] = '';
+    }
+    $rowDetail[] = l('Edit', "civimigrate-mapper/{$result->cmid}/edit");
+    $table['rows'][] = $rowDetail;
   }
   return theme('table', $table);
 }
@@ -137,4 +164,78 @@ function civimigrate_form_submit($form, &$form_state) {
   $result = db_update('civimigrate_mappings')->fields($record)->condition('cmid', $form_state['values']['cmid'])->execute();
   drupal_set_message("$result row(s) updated.");
   drupal_goto('civimigrate-mapper');
+}
+
+/**
+* Implements hook_entity_info().
+*/
+function civimigrate_entity_info() {
+  $entity_info['civimigrate_mapping'] = array(
+    'label' => t('CiviMigrate Mappings'),
+    'fieldable' => FALSE,
+    'entity keys' => array(
+      'id' => 'cmid'
+    ),
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'civimigrate_mappings',
+    'uri callback' => 'civimigrate_uri',
+    'label callback' => 'entity_class_label',
+    'static cache' => TRUE,
+    'module' => 'civimigrate',
+    'access callback' => 'civimigrate_mapping_access',
+    'views controller class' => 'EntityDefaultViewsController',
+    'view modes' => array(
+      'full' => array(
+        'label' => t('CiviMigrate Mapping'),
+        'custom settings' =>  FALSE,
+      ),
+    )
+  );
+
+  return $entity_info;
+}
+
+/**
+ * @param $mapping
+ *
+ * @return array
+ */
+function civimigrate_uri($mapping){
+  return array(
+    'path' => 'civimigrate_mapping/' . $mapping->id,
+  );
+}
+
+/**
+ * Placeholder access function
+ * @return bool
+ */
+function civimigrate_mapping_access() {
+  return TRUE;
+}
+
+/**
+ * fill the mappings table - ie
+ * civimigrate_populate_mappings('records', array('migration' => 'Contacts'));
+ * @param $table
+ * @param array $defaults
+ */
+function civimigrate_populate_mappings($table, $defaults = array()) {
+  $columns = db_query("SHOW columns from {" .  $table . "}")->fetchAllAssoc('Field');
+  $tableColumns = explode(',', strtolower(implode(',', array_keys($columns))));
+  $existingColumns = db_query("SELECT real_name FROM {civimigrate_mappings} WHERE table_name = :1", array(':1' => $table))->fetchAllAssoc('real_name');
+  $missingFields = array_diff_key(array_flip($tableColumns), $existingColumns);
+
+  foreach (array_keys($missingFields) as $missingField) {
+    $entity = entity_create('civimigrate_mapping', array_merge(
+      array(
+        //'default' => '',
+        'source_field' => $table . '_' . $missingField,
+        'real_name' => $missingField,
+        'table_name' => $table,
+      ),
+      $defaults));
+    $entity->save();
+  }
 }
