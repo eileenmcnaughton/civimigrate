@@ -60,7 +60,8 @@ abstract class Civimigration extends Migration {
         ->description($mapping->mappings_description)
         ->issueGroup($mapping->mappings_issuegroup)
         ->defaultValue($mapping->mappings_default) ;
-      }else{
+      }
+      else{
         $this->addFieldMapping($destField, $sourceField)
         ->description($mapping->mappings_description)
         ->issueGroup($mapping->mappings_issuegroup)
@@ -127,7 +128,7 @@ abstract class Civimigration extends Migration {
     return $mappings;
   }
 
-  /*
+  /**
    * Get all fields in table
    */
   protected function gettableFields($table, $alias = ""){
