@@ -2,11 +2,10 @@ name = "CiviMigrate"
 description = "CiviCRM Migrate extension"
 core = 7.x
 package = "Migrate"
-dependencies[] = migrate
+dependencies[] = migrate (>7.x-2.6-beta1)
 dependencies[] = civicrm
 files[] = destinations/civicrm_api.inc
 files[] = civimigratecustomfields.class.inc
 files[] = civimigrateoptions.class.inc
 files[] = sources/civijson.inc
 files[] = civimigrate.class.inc
-
