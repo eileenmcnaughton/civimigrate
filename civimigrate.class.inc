@@ -87,7 +87,7 @@ abstract class Civimigration extends Migration {
    */
   protected function getQuery($table,$alias, $idKey =""){
     $query = db_select( $table ,$alias, array('target' => $this->_db_target));
-    $this->addFieldsFromtable($query,$table,$alias, $idKey);
+    $this->addFieldsFromtable($query, $table, $alias, $idKey);
     return $query;
   }
 /*

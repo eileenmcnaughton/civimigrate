@@ -224,7 +224,8 @@ function civimigrate_mapping_access() {
 
 /**
  * fill the mappings table - ie
- * civimigrate_populate_mappings('records', array('migration' => 'Contacts'));
+ * civimigrate_populate_mappings('records', array('migration' => 'Contacts', 'issuegroup' => 'needs mapping'));
+ *
  * @param $table
  * @param array $defaults
  */
