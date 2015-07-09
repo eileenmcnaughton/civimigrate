@@ -124,6 +124,11 @@ function civimigrate_form($form, &$form_state, $cmid) {
     '#type' => 'textarea',
     '#default_value' => $cmid['description']
   );
+  $form['default_value'] = array(
+    '#title' => 'Default value',
+    '#type' => 'textarea',
+    '#default_value' => $cmid['default_value']
+  );
   $form['table_name'] = array(
     '#title' => 'Table',
     '#type' => 'textfield',

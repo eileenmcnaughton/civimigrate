@@ -31,7 +31,7 @@ $schema['civimigrate_mappings'] = array(
         'length' => 32,
         'not null' => FALSE,
       ),
-       'default' => array(
+       'default_value' => array(
         'description' => 'default value for field',
         'type' => 'varchar',
         'length' => 32,
@@ -112,6 +112,18 @@ function civimigrate_update_7001() {
     'type' => 'varchar',
     'length' => 32,
     'not null' => FALSE)
+  );
+}
+
+/**
+ * lengthen source, allow null on default
+ */
+function civimigrate_update_7002() {
+  db_change_field('civimigrate_mappings', 'default', 'default_value', array(
+      'description' => 'default value for field',
+      'type' => 'varchar',
+      'length' => 32,
+      'not null' => FALSE)
   );
 }
 
