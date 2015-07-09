@@ -52,23 +52,7 @@ abstract class Civimigration extends Migration {
         $this->source = new MigrateSourceSQL($query);
       }
     }
-    $mappings = $this->getmappings();
-    foreach ($mappings as $mapping) {
-      $destField = empty($mapping->mappings_destination_field) ? null : $mapping->mappings_destination_field;
-      $sourceField = empty($mapping->mappings_source_field) ? null : $mapping->mappings_source_field;
-      if(empty($sourceField)){
-        $this->addFieldMapping($destField)
-        ->description($mapping->mappings_description)
-        ->issueGroup($mapping->mappings_issuegroup)
-        ->defaultValue($mapping->mappings_default) ;
-      }
-      else{
-        $this->addFieldMapping($destField, $sourceField)
-        ->description($mapping->mappings_description)
-        ->issueGroup($mapping->mappings_issuegroup)
-        ->defaultValue($mapping->mappings_default) ;
-      }
-    }
+    $this->setDatabaseStoredMappings();
   }
   /*
    * You can override this but the default function does a lookup on external identifier
@@ -177,5 +161,31 @@ abstract class Civimigration extends Migration {
      return date('Y-m-d',$timestamp);
    }
 
+  /**
+   * Set mappings from database.
+   *
+   * Migrate mappings can optionally be stored in the civimigrate_mappings table.
+   * This function loads those.
+   */
+  protected function setDatabaseStoredMappings() {
+    $mappings = $this->getmappings();
+    foreach ($mappings as $mapping) {
+      $destField = empty($mapping->mappings_destination_field) ? NULL : $mapping->mappings_destination_field;
+      $sourceField = empty($mapping->mappings_source_field) ? NULL : $mapping->mappings_source_field;
+      if (empty($sourceField)) {
+        $this->addFieldMapping($destField)
+          ->description($mapping->mappings_description)
+          ->issueGroup($mapping->mappings_issuegroup)
+          ->defaultValue($mapping->mappings_default_value);
+      }
+      else {
+        $this->addFieldMapping($destField, $sourceField)
+          ->description($mapping->mappings_description)
+          ->issueGroup($mapping->mappings_issuegroup)
+          ->defaultValue($mapping->mappings_default);
+      }
+    }
+  }
 
- }
+
+}
