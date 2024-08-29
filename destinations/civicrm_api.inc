@@ -151,7 +151,11 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
       drupal_set_message("<pre>Params as passed to API".print_r($params,true)."</pre>");
     }
     migrate_instrument_start('civicrm_' . $this->entity . '_import');
-    $apiresult = civicrm_api($this->entity,'create',$params);
+
+    $params['check_permission'] = FALSE;
+
+    $apiresult = civicrm_api($this->entity, 'create', $params);
+
     if($this->debug ==1){
       drupal_set_message("<pre>Result from API".print_r($apiresult,true)."</pre>");
     }
