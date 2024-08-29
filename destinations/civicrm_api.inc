@@ -77,9 +77,16 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
     migrate_instrument_start('civicrm_contact_delete_multiple');
     $this->prepareRollback($ids);
     foreach ($ids as $id) {
-      try{
-        civicrm_api($this->entity, 'delete', array('version' => 3, 'id' => $id, 'skip_undelete' => 1));
-      } catch (Exception $e){
+      try {
+        if ($this->entity === 'EntityTag') {
+          // api3 doesnt support deleting tags directly
+          \Civi\Api4\EntityTag::delete(FALSE)->addWhere('id', '=', $id)->execute();
+        }
+        else {
+          civicrm_api($this->entity, 'delete', ['version' => 3, 'id' => $id, 'skip_undelete' => 1]);
+        }
+      }
+      catch (Exception $e) {
         throw new MigrateException('failed to delete ' . $id);
       }
     }
@@ -151,7 +158,20 @@ class MigrateDestinationCivicrmApi extends MigrateDestinationEntity {
       drupal_set_message("<pre>Params as passed to API".print_r($params,true)."</pre>");
     }
     migrate_instrument_start('civicrm_' . $this->entity . '_import');
-    $apiresult = civicrm_api($this->entity,'create',$params);
+
+    $apiresult = civicrm_api($this->entity, 'create', $params);
+
+    // api3 doesn't return EntityTag ids
+    // to enable rollback fetch now using Api4
+    // (the EntityTag record should be uniquely determined by contact_id and tag_id)
+    if ($this->entity === 'EntityTag' && !empty($params['contact_id']) && $apiresult['added'] ?? FALSE) {
+        $apiresult['id'] = Civi\Api4\EntityTag::get(FALSE)
+          ->addWhere('tag_id', '=', $params['tag_id'])
+          ->addWhere('entity_id', '=', $params['contact_id'])
+          ->addWhere('entity_table', '=', 'civicrm_contact')
+          ->execute()->single()['id'];
+    }
+
     if($this->debug ==1){
       drupal_set_message("<pre>Result from API".print_r($apiresult,true)."</pre>");
     }
